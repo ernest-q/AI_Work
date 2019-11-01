@@ -31,6 +31,24 @@ def mazeToArray(fileSelect):
 
     return 0
 
+def printMaze(maze):
+    for i in range(len(maze)):
+            print()
+            for x in range(len(maze[i])):
+                print(maze[i][x],end="")
+
+def getStartPos(maze):
+    for i in range(len(maze)):
+            print()
+            for x in range(len(maze[i])):
+                if maze[i][x] == "P":
+                    start = (i,x)
+                print(maze[i][x],end="")
+    
+    return start
+
+def getGoalPos(maze):
+    return 0
 
 def depthFirstSearch(maze):
 
@@ -41,13 +59,8 @@ def depthFirstSearch(maze):
     while(not success):
         yah = input("continue?")
 
-        """MAKE THIS INTO A SEPERATE METHOD, CURRENT POSITION"""
-        for i in range(len(maze)):
-            print()
-            for x in range(len(maze[i])):
-                if maze[i][x] == "P":
-                    start = (i,x)
-                print(maze[i][x],end="")
+        """GETS THE START POSITION"""
+        start = getStartPos(maze)
         x,y = start
 
         """GOAL TEST, POSSIBLY DO SEPERATE METHOD IF REPEATED"""
@@ -135,17 +148,9 @@ def depthFirstSearch(maze):
                 maze[x][y] = "-"
                 activePath.pop()
         
-
-
-
-        for i in range(len(maze)):
-            print()
-            for x in range(len(maze[i])):
-                print(maze[i][x],end="")
-
+        printMaze(maze)
         """print(activePath)"""
         
-    return 0
 
 def breadthFirstSearch(maze):
 
@@ -156,12 +161,7 @@ def breadthFirstSearch(maze):
         yah = input("continue?")
 
         """GETS START POSITION"""
-        for i in range(len(maze)):
-            print()
-            for x in range(len(maze[i])):
-                if maze[i][x] == "P":
-                    start = (i,x)
-                print(maze[i][x],end="")
+        start = getStartPos(maze)
         x,y = start
 
     return 0
