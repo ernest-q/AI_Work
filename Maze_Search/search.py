@@ -2,30 +2,52 @@ import argparse
 import os.path
 from os import path
 
+class PriorityQueue(object):
+    def __init__(self):
+        self.queue=[]
+
+    def __str__(self): 
+        return ' '.join([str(i) for i in self.queue])
+
+    def isEmpty(self):
+        return len(self.queue) == []
+    
+    def insert(self,datax,datay,h):
+        self.queue.append((datax,datay,h))
+
+    def delete(self):
+        try:
+            max = 0
+            for i in range(len(self.queue)):
+                if self.queue[i][2] < self.queue[max][2]:
+                    max = i
+                item = self.queue[max]
+                del self.queue[max]
+                return item
+        except IndexError:
+            print()
+            exit()
 
 def mazeToArray(fileSelect):
 
     file = open("{}".format(fileSelect),"r")
     contents = file.read()
-    print(contents)
-    print(type(contents))
+    """print(contents)
+    print(type(contents))"""
 
     split = contents.split("\n")
     """print(split)"""
     for i in range(len(split)):
-        print(split[i])
+        """print(split[i])"""
 
     mazeArray = []
     for i in range(len(split)):
-        print()
         innerMaze = []
         for x in range(len(split[i])):
-            print(split[i][x],end="")
+            """print(split[i][x],end="")"""
             innerMaze.append(split[i][x])
         mazeArray.append(innerMaze)
     
-    depthFirstSearch(mazeArray)
-
     return mazeArray
 
 def printMaze(maze):
@@ -168,24 +190,51 @@ def breadthFirstSearch(maze):
 
     return 0
 
-def calcManDistance((startX,startY),(goalX,goalY)):
+def calcManDistance(startX,startY,goalX,goalY):
     manhatDist = abs(startX - goalX) + abs(startY - goalY)
     return manhatDist
 
 def greedSearch(maze):
 
     success = False
+    start = getStartPos(maze)
+    goal = getGoalPos(maze)
+    goalx, goaly = goal
+    x,y = start
+    pq = PriorityQueue()
+    pq.insert(x,y,99)
+
+    """UP,LEFT,DOWN,RIGHT"""
+    printMaze(maze)
+
     while(not success):
-        yah = input("continue?")
-        start = getStartPos(maze)
-        goal = getGoalPos(maze)
-        x,y = start
-        goalx,goaly = goal
+        """yah = input("continue?")"""
+        x, y, h = pq.delete()
+        maze[x][y] = "+"
+        if h == 0:
+            success = True
+        else:
+            """MAYBE MAKE INTO GETADJ WITH HERUISTIC BOOL"""
+            if maze[x-1][y] == " ":
+                heuristic = calcManDistance(x-1,y,goalx,goaly)
+                pq.insert(x-1,y,heuristic)
+                printMaze(maze)
 
-        heuristic = calcManDistance(start,goal)
+            if maze[x][y-1] == " ":
+                heuristic = calcManDistance(x,y-1,goalx,goaly)
+                pq.insert(x,y-1,heuristic)
+                printMaze(maze)
 
-        """UP,LEFT,DOWN,RIGHT"""
-        
+            if maze[x+1][y] == " ":
+                heuristic = calcManDistance(x+1,y,goalx,goaly)
+                pq.insert(x+1,y,heuristic)
+                printMaze(maze)
+            
+            if maze[x][y+1] == " ":
+                heuristic = calcManDistance(x,y+1,goalx,goaly)
+                pq.insert(x,y+1,heuristic)
+                printMaze(maze)
+
 
     return 0
 
@@ -212,14 +261,11 @@ def main():
     parser.add_argument("maze", help="maze.txt")
     
     args = parser.parse_args()
-    """print(args.method)
-    print(args.maze)"""
     fileName = args.maze
     
     if path.exists(fileName):
 
         theMaze = mazeToArray(fileName)
-        print(theMaze)
 
         if args.method == "depth":
             depthFirstSearch(theMaze)
@@ -227,11 +273,13 @@ def main():
         elif args.method == "breadth":
             print("bred")
         elif args.method == "greedy":
+            greedSearch(theMaze)
             print("greed")
         elif args.method == "astar":
             print("astar")
         else:
             print("Invalid operation")
+            exit()
     else:
         print("Invalid file name")
 
