@@ -23,13 +23,10 @@ def mazeToArray(fileSelect):
             print(split[i][x],end="")
             innerMaze.append(split[i][x])
         mazeArray.append(innerMaze)
-
     
     depthFirstSearch(mazeArray)
 
-    
-
-    return 0
+    return mazeArray
 
 def printMaze(maze):
     for i in range(len(maze)):
@@ -43,12 +40,17 @@ def getStartPos(maze):
             for x in range(len(maze[i])):
                 if maze[i][x] == "P":
                     start = (i,x)
-                print(maze[i][x],end="")
     
     return start
 
 def getGoalPos(maze):
-    return 0
+    for i in range(len(maze)):
+            print()
+            for x in range(len(maze[i])):
+                if maze[i][x] == ".":
+                    goal = (i,x)
+                
+    return goal
 
 def depthFirstSearch(maze):
 
@@ -166,24 +168,21 @@ def breadthFirstSearch(maze):
 
     return 0
 
+def calcManDistance((startX,startY),(goalX,goalY)):
+    manhatDist = abs(startX - goalX) + abs(startY - goalY)
+    return manhatDist
+
 def greedSearch(maze):
 
     success = False
     while(not success):
         yah = input("continue?")
-        for i in range(len(maze)):
-            print()
-            for x in range(len(maze[i])):
-                if maze[i][x] == "P":
-                    start = (i,x)
-                elif maze[i][x] == ".":
-                    goal = (i,x)
-                print(maze[i][x],end="")
+        start = getStartPos(maze)
+        goal = getGoalPos(maze)
         x,y = start
         goalx,goaly = goal
 
-        manhatDist = abs(x-goalx) + abs(y-goaly)
-
+        heuristic = calcManDistance(start,goal)
 
         """UP,LEFT,DOWN,RIGHT"""
         
@@ -195,22 +194,15 @@ def aStarSearch(maze):
     success = False
     while(not success):
 
-        for i in range(len(maze)):
-            print()
-            for x in range(len(maze[i])):
-                if maze[i][x] == "P":
-                    start = (i,x)
-                elif maze[i][x] == ".":
-                    goal = (i,x)
-                print(maze[i][x],end="")
+        start = getStartPos(maze)
+        goal = getGoalPos(maze)
         x,y = start
         goalx,goaly = goal
 
-        manhatDist = abs(x-goalx) + abs(y-goaly)
+        heuristic = calcManDistance(start,goal)
 
         """UP,LEFT,DOWN,RIGHT"""
         
-
     return 0
 
 
@@ -230,6 +222,7 @@ def main():
         print(theMaze)
 
         if args.method == "depth":
+            depthFirstSearch(theMaze)
             print("dep")
         elif args.method == "breadth":
             print("bred")
