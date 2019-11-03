@@ -154,6 +154,7 @@ def returnPath(maze,start,goal):
     x,y = goal
     path.insert(0,(x,y))
     while(not finished):
+        #yah = input("continue?")
         if (x,y) == (goalX,goalY):
             maze[goalX][goalY] = "."
             printMaze(maze)
@@ -180,6 +181,7 @@ def returnPath(maze,start,goal):
                 path.insert(0,(x-1,y))
                 printMaze(maze)
     
+    print("Path Cost: {}".format(len(path)))
 
 def betterDepthFirst(maze):
     stack = []
@@ -191,26 +193,33 @@ def betterDepthFirst(maze):
     goal = getGoalPos(maze)
     hasAdj = True
     while(not success):
-        yah = input("continue?")
+        #yah = input("step 1: ")
+        
 
+        #yah = input("step 2: ")
         if stack != [] and hasAdj:
             x,y = stack.pop()
             maze[x][y] = "+"
-            
             """This instead of below"""
+
+            #yah = input("step 2a: ")
             if (x,y) not in visited:
                 visited.append((x,y))
-
             #visited.append((x,y))
+
         elif stack != [] and not hasAdj:
+            #yah = input("step 2b: ")
             maze[x][y] = "-"
             x,y = visited.pop()
         else:
             break
 
+        #yah = input("step 3: ")
         if (x,y) == goal:
             success = True
             break
+
+        #yah = input("step 4: ")
         hasAdj = False
         if maze[x][y+1] == " " or maze[x][y+1] == ".":
             stack.append((x,y+1))
@@ -224,11 +233,28 @@ def betterDepthFirst(maze):
         if maze[x-1][y] == " " or maze[x-1][y] == ".":
             stack.append((x-1,y))
             hasAdj = True
-    
-        printMaze(maze)
-        print("stack: ",stack)
-        print("vistied: ",visited)
 
+        
+
+        #yah = input("step 5: ")
+        printMaze(maze)
+        #print("stack: ",stack)
+        #print("vistied: ",visited)
+
+    for i in range(len(stack)):
+        cords = stack[i]
+        x,y = cords
+        maze[x][y] = "0"
+
+    printMaze(maze)
+    
+    #repeated = []
+    #for i in range(len(stack)):
+    #    for x in range(len(visited)):
+    #        if stack[i] == visited[x]:
+    #            repeated.append(stack[i])
+    #print("\n\n\n")
+    #print("repeated: {}".format(repeated))
         
 
 def breadthFirstSearch(maze):
@@ -292,6 +318,7 @@ def greedSearch(maze):
     printMaze(maze)
     print(pq.empty())
     while(not success):
+
         yah = input("continue?")
         h, cords = pq.get()
         print(pq.empty())
@@ -327,6 +354,87 @@ def greedSearch(maze):
 
 def aStarSearch(maze):
 
+    success = False
+    start = getStartPos(maze)
+    goal = getGoalPos(maze)
+    goalx, goaly = goal
+    x,y = start
+    pq = PriorityQueue()
+    """Added, the 0 at the end """
+    pq.put((1,0,(x,y)))
+
+    visited = []
+
+    while not success:
+        #yah = input("continue?")
+        h,sp, cords = pq.get()
+        x, y = cords
+        visited.append((x,y))
+
+        if (x,y) == (goalx,goaly):
+            break
+        if h == 0:
+            success = True
+            break
+        else:
+            if maze[x-1][y] == " " or maze[x-1][y] == ".":
+                """manD = calcManDistance(x-1,y,goalx,goaly)
+                stepCost = (int(maze[x][y])+1)
+                maze[x-1][y] = "{}".format(stepCost)
+                h = manD + stepCost
+                pq.put((h,(x-1,y)))
+                printMaze(maze)"""
+                manD = calcManDistance(x-1,y,goalx,goaly)
+                stepCost = (sp+1)
+                maze[x-1][y] = "v"
+                h = manD + stepCost
+                pq.put((h,stepCost,(x-1,y)))
+                printMaze(maze)
+
+            if maze[x][y-1] == " " or maze[x][y-1] == ".":
+                """manD = calcManDistance(x,y-1,goalx,goaly)
+                stepCost = (int(maze[x][y])+1)
+                maze[x][y-1] = "{}".format(stepCost)
+                h = manD + stepCost
+                pq.put((h,(x,y-1)))
+                printMaze(maze)"""
+                manD = calcManDistance(x,y-1,goalx,goaly)
+                stepCost = (sp+1)
+                maze[x][y-1] = ">"
+                h = manD + stepCost
+                pq.put((h,stepCost,(x,y-1)))
+                printMaze(maze)
+                
+            if maze[x+1][y] == " " or maze[x+1][y] == ".":
+                """manD = calcManDistance(x+1,y,goalx,goaly)
+                stepCost = (int(maze[x][y])+1)
+                maze[x+1][y] = "{}".format(stepCost)
+                h = manD + stepCost
+                pq.put((h,(x+1,y)))
+                printMaze(maze)"""
+                manD = calcManDistance(x+1,y,goalx,goaly)
+                stepCost = (sp+1)
+                maze[x+1][y] = "^"
+                h = manD + stepCost
+                pq.put((h,stepCost,(x+1,y)))
+                printMaze(maze)
+                
+            if maze[x][y+1] == " " or maze[x][y+1] == ".":
+                """manD = calcManDistance(x,y+1,goalx,goaly)
+                stepCost = (int(maze[x][y])+1)
+                maze[x][y+1] = "{}".format(stepCost)
+                h = manD + stepCost
+                pq.put((h,(x,y+1)))
+                printMaze(maze)"""
+                manD = calcManDistance(x,y+1,goalx,goaly)
+                stepCost = (sp+1)
+                maze[x][y+1] = "<"
+                h = manD + stepCost
+                pq.put((h,stepCost,(x,y+1)))
+                printMaze(maze)
+
+    print(returnPath(maze,start,goal))    
+            
     return 0
 
 def main():
@@ -351,7 +459,7 @@ def main():
             greedSearch(theMaze)
             
         elif args.method == "astar":
-            print("astar")
+            aStarSearch(theMaze)
         else:
             print("Invalid operation")
             exit()
