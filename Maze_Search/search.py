@@ -4,6 +4,21 @@ from os import path
 from queue import PriorityQueue
 from queue import Queue
 
+class Node:
+    def __init__(self, cargo=None, parent=None, child=None):
+        self.cargo = cargo
+        self.parent = parent
+        self.child = child
+    
+    def __str__(self):
+        return str(self.cargo)
+
+    def getCargo(self):
+        return self.cargo
+
+    def getParent(self):
+        return self.parent
+
 def mazeToArray(fileSelect):
 
     file = open("{}".format(fileSelect),"r")
@@ -44,108 +59,6 @@ def getGoalPos(maze):
                 
     return goal
 
-def depthFirstSearch(maze):
-
-    """FINISH ADDING THE SOLUTION COST """
-    solutionCost = 0
-    activePath = []
-    success = False
-    while(not success):
-        #yah = input("continue?")
-
-        """GETS THE START POSITION"""
-        start = getStartPos(maze)
-        print(start)
-        x,y = start
-
-        """GOAL TEST, POSSIBLY DO SEPERATE METHOD IF REPEATED"""
-        if maze[x-1][y] == ".":
-            maze[x-1][y] = "P"
-            maze[x][y] = "+"
-            activePath.append((x,y))
-            solutionCost += 1
-            print("SUCCESS")
-            success = True
-            break
-
-        elif maze[x][y-1] == ".":
-            maze[x][y-1] = "P"
-            maze[x][y] = "+"
-            activePath.append((x,y))
-            solutionCost += 1
-            print("SUCCESS")
-            print(activePath)
-            success = True
-            break
-
-        elif maze[x+1][y] == ".":
-            maze[x+1][y] = "P"
-            maze[x][y] = "+"
-            activePath.append((x,y))
-            solutionCost += 1
-            print("SUCCESS")
-            print(activePath)
-            success = True
-            break
-
-        elif maze[x][y+1] == ".":
-            maze[x][y+1] = "P"
-            maze[x][y] = "+"
-            activePath.append((x,y))
-            solutionCost += 1
-            print("SUCCESS")
-            print(activePath)
-            success = True
-            break
-
-        if maze[x-1][y] == " ":
-            maze[x-1][y] = "P"
-            maze[x][y] = "+"
-            activePath.append((x,y))
-            solutionCost += 1
-
-        elif maze[x][y-1] == " ":
-            maze[x][y-1] = "P"
-            maze[x][y] = "+"
-            activePath.append((x,y))
-            solutionCost += 1
-        
-        elif maze[x+1][y] == " ":
-            maze[x+1][y] = "P"
-            maze[x][y] = "+"
-            activePath.append((x,y))
-            solutionCost += 1
-        
-        elif maze[x][y+1] == " ":
-            maze[x][y+1] = "P"
-            maze[x][y] = "+"
-            activePath.append((x,y))
-            solutionCost += 1
-
-        else:
-            if maze[x-1][y] == "+" and (x-1,y) == activePath[len(activePath)-1]:
-                maze[x-1][y] = "P"
-                maze[x][y] = "-"
-                activePath.pop()
-
-            elif maze[x][y-1] == "+" and (x,y-1) == activePath[len(activePath)-1]:
-                maze[x][y-1] = "P"
-                maze[x][y] = "-"
-                activePath.pop()
-            
-            elif maze[x+1][y] == "+" and (x+1,y) == activePath[len(activePath)-1]:
-                maze[x+1][y] = "P"
-                maze[x][y] = "-"
-                activePath.pop()
-            
-            elif maze[x][y+1] == "+" and (x,y+1) == activePath[len(activePath)-1]:
-                maze[x][y+1] = "P"
-                maze[x][y] = "-"
-                activePath.pop()
-        
-        printMaze(maze)
-        """print(activePath)"""
-
 def returnPath(maze,start,goal):
     print("here")
     path = []
@@ -182,120 +95,6 @@ def returnPath(maze,start,goal):
                 printMaze(maze)
     
     print("Path Cost: {}".format(len(path)))
-
-def betterDepthFirst(maze):
-    stack = []
-    visited = []
-    start = getStartPos(maze)
-    x,y = start
-    stack.append((x,y))
-    success = False
-    goal = getGoalPos(maze)
-    hasAdj = True
-    while(not success):
-        #yah = input("step 1: ")
-        
-
-        #yah = input("step 2: ")
-        if stack != [] and hasAdj:
-            x,y = stack.pop()
-            maze[x][y] = "+"
-            """This instead of below"""
-
-            #yah = input("step 2a: ")
-            if (x,y) not in visited:
-                visited.append((x,y))
-            #visited.append((x,y))
-
-        elif stack != [] and not hasAdj:
-            #yah = input("step 2b: ")
-            maze[x][y] = "-"
-            x,y = visited.pop()
-        else:
-            break
-
-        #yah = input("step 3: ")
-        if (x,y) == goal:
-            success = True
-            break
-
-        #yah = input("step 4: ")
-        hasAdj = False
-        if maze[x][y+1] == " " or maze[x][y+1] == ".":
-            stack.append((x,y+1))
-            hasAdj = True
-        if maze[x+1][y] == " " or maze[x+1][y] == ".":
-            stack.append((x+1,y))
-            hasAdj = True
-        if maze[x][y-1] == " " or maze[x][y-1] == ".":
-            stack.append((x,y-1))
-            hasAdj = True
-        if maze[x-1][y] == " " or maze[x-1][y] == ".":
-            stack.append((x-1,y))
-            hasAdj = True
-
-        
-
-        #yah = input("step 5: ")
-        printMaze(maze)
-        #print("stack: ",stack)
-        #print("vistied: ",visited)
-
-    for i in range(len(stack)):
-        cords = stack[i]
-        x,y = cords
-        maze[x][y] = "0"
-
-    printMaze(maze)
-    
-    #repeated = []
-    #for i in range(len(stack)):
-    #    for x in range(len(visited)):
-    #        if stack[i] == visited[x]:
-    #            repeated.append(stack[i])
-    #print("\n\n\n")
-    #print("repeated: {}".format(repeated))
-        
-
-def breadthFirstSearch(maze):
-    queue = []
-    start = getStartPos(maze)
-    print(start)
-    x,y = start
-    queue.append((x,y))
-    success = False
-    goal = getGoalPos(maze)
-
-    while(not success):
-        """yah = input("continue?")"""
-        if queue != []:
-            x,y = queue.pop(0)
-        else:
-            break
-        
-        if (x,y) == goal:
-            success = True
-            break
-        
-        if maze[x-1][y] == " " or maze[x-1][y] == ".":
-            maze[x-1][y] = "v"
-            queue.append((x-1,y))
-            printMaze(maze)
-        if maze[x][y-1] == " " or maze[x][y-1] == ".":
-            maze[x][y-1] = ">"
-            queue.append((x,y-1))
-            printMaze(maze)
-        if maze[x+1][y] == " " or maze[x+1][y] == ".":
-            maze[x+1][y] = "^"
-            queue.append((x+1,y))
-            printMaze(maze)
-        if maze[x][y+1] == " " or maze[x][y+1] == ".":
-            maze[x][y+1] = "<"
-            queue.append((x,y+1))
-            printMaze(maze)
-        
-    print(returnPath(maze,start,goal))
-
 
 def calcManDistance(startX,startY,goalX,goalY):
     manhatDist = abs(startX - goalX) + abs(startY - goalY)
@@ -437,6 +236,117 @@ def aStarSearch(maze):
             
     return 0
 
+def checkAdj(maze,x,y,visited):
+    up = False
+    left = False
+    down = False
+    right = False
+
+    if maze[x-1][y] != "%" and (x-1,y) not in visited:
+        up = True
+    if maze[x][y-1] != "%" and (x,y-1) not in visited:
+        left = True
+    if maze [x+1][y] != "%" and (x+1,y) not in visited:
+        down = True
+    if maze [x][y+1] != "%" and (x,y+1) not in visited:
+        right = True
+
+    return up,left,down,right
+
+
+def betterbreadth(maze):
+
+    start = getStartPos(maze)
+    goal = getGoalPos(maze)
+    goalx, goaly = goal
+    x,y = start
+
+    root = Node((x,y))
+    frontier = []
+    frontier.append(root)
+    visited = []
+
+    while frontier:
+        root = frontier.pop(0)
+
+        x,y = root.getCargo()
+        if (x,y) == (goalx,goaly):
+            break
+        print(x,y)
+        up,left,down,right = checkAdj(maze,x,y,visited)
+        print(up,left,down,right)
+        visited.append((x,y))
+        if up:
+            newNode1 = Node((x-1,y),root)
+            frontier.append(newNode1)
+        if left:
+            newNode2 = Node((x,y-1),root)
+            frontier.append(newNode2)
+        if down:
+            newNode3 = Node((x+1,y),root)
+            frontier.append(newNode3)
+        if right:
+            newNode4 = Node((x,y+1),root)
+            frontier.append(newNode4)
+        
+    while root.getParent() != None:
+        print(root.getCargo())
+        x,y = root.getCargo()
+        maze[x][y] = "O"
+        root = root.parent
+    
+    printMaze(maze)
+
+def betterDepthNode(maze):
+
+    start = getStartPos(maze)
+    goal = getGoalPos(maze)
+    goalx, goaly = goal
+    x,y = start
+
+    root = Node((x,y))
+    stack = []
+    stack.append(root)
+    visited = []
+
+    while stack:
+        root = stack.pop()
+
+        x,y = root.getCargo()
+        if (x,y) == (goalx,goaly):
+            break
+        print(x,y)
+        up,left,down,right = checkAdj(maze,x,y,visited)
+        print(up,left,down,right)
+        visited.append((x,y))
+        
+        if right:
+            newNode4 = Node((x,y+1),root)
+            stack.append(newNode4)
+        if down:
+            newNode3 = Node((x+1,y),root)
+            stack.append(newNode3)
+        if left:
+            newNode2 = Node((x,y-1),root)
+            stack.append(newNode2)
+        if up:
+            newNode1 = Node((x-1,y),root)
+            stack.append(newNode1)
+    
+    while root.getParent() != None:
+        print(root.getCargo())
+        x,y = root.getCargo()
+        maze[x][y] = "O"
+        root = root.parent
+    
+    printMaze(maze)
+
+    for i in range(len(visited)):
+        x,y = visited[i]
+        maze[x][y] = "X"
+
+    printMaze(maze)
+
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--method", help="method")
@@ -449,11 +359,10 @@ def main():
         theMaze = mazeToArray(fileName)
        
         if args.method == "depth":
-            #depthFirstSearch(theMaze)
-            betterDepthFirst(theMaze)
+            betterDepthNode(theMaze)
 
         elif args.method == "breadth":
-            breadthFirstSearch(theMaze)
+            betterbreadth(theMaze)
 
         elif args.method == "greedy":
             greedSearch(theMaze)
@@ -465,7 +374,6 @@ def main():
             exit()
     else:
         print("Invalid file name")
-
 
 if __name__ == "__main__":
     main()
