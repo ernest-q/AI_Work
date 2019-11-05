@@ -25,12 +25,11 @@ def mazeToArray(fileSelect):
     contents = file.read()
 
     splitMaze = contents.split("\n")
-    for i in range(len(splitMaze)):
-        mazeArray = []
+    mazeArray = []
+
     for i in range(len(splitMaze)):
         innerMaze = []
         for x in range(len(splitMaze[i])):
-            
             innerMaze.append(splitMaze[i][x])
         mazeArray.append(innerMaze)
     
@@ -272,10 +271,11 @@ def betterbreadth(maze):
         x,y = root.getCargo()
         if (x,y) == (goalx,goaly):
             break
-        print(x,y)
         up,left,down,right = checkAdj(maze,x,y,visited)
-        print(up,left,down,right)
-        visited.append((x,y))
+
+        if (x,y) not in visited:
+            visited.append((x,y))
+
         if up:
             newNode1 = Node((x-1,y),root)
             frontier.append(newNode1)
@@ -289,13 +289,7 @@ def betterbreadth(maze):
             newNode4 = Node((x,y+1),root)
             frontier.append(newNode4)
         
-    while root.getParent() != None:
-        print(root.getCargo())
-        x,y = root.getCargo()
-        maze[x][y] = "O"
-        root = root.parent
-    
-    printMaze(maze)
+    printMazePathCost(maze,root,visited)
 
 def betterDepthNode(maze):
 
@@ -311,14 +305,13 @@ def betterDepthNode(maze):
 
     while stack:
         root = stack.pop()
-
         x,y = root.getCargo()
         if (x,y) == (goalx,goaly):
             break
-        print(x,y)
+
         up,left,down,right = checkAdj(maze,x,y,visited)
-        print(up,left,down,right)
-        visited.append((x,y))
+        if (x,y) not in visited:
+            visited.append((x,y))
         
         if right:
             newNode4 = Node((x,y+1),root)
@@ -333,21 +326,142 @@ def betterDepthNode(maze):
             newNode1 = Node((x-1,y),root)
             stack.append(newNode1)
     
-    while root.getParent() != None:
-        print(root.getCargo())
-        x,y = root.getCargo()
-        maze[x][y] = "O"
-        root = root.parent
-    
-    printMaze(maze)
+    printMazePathCost(maze,root,visited)
 
-    for i in range(len(visited)):
-        x,y = visited[i]
-        maze[x][y] = "X"
+def bettergreedSearch(maze):
 
+    start = getStartPos(maze)
+    goal = getGoalPos(maze)
+    goalx, goaly = goal
+    x,y = start
+    root = Node((x,y))
+    pq = PriorityQueue()
+    pq.put((1,root))
+
+    visited = []
+
+    while pq:
+        #yah = input("continue?")
+
+        """
+        FIX THIS HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        """
+
+        z = pq.get()
+        #h = z[0]
+        #x,y = z[1].getCargo()
+        #root = z[1]
+        print(z[1].getCargo())
+        
+        
+        #x,y = root.getCargo()
+
+        if (x,y) == (goalx,goaly):
+            break
+        up,left,down,right = checkAdj(maze,x,y,visited)
+
+        if (x,y) not in visited:
+            visited.append((x,y))
+
+        if up:
+            newNode1 = Node((x-1,y),root)
+            heuristic = calcManDistance(x-1,y,goalx,goaly)
+            pq.put(heuristic,(newNode1))
+        if left:
+            newNode2 = Node((x,y-1),root)
+            heuristic = calcManDistance(x,y-1,goalx,goaly)
+            pq.put(heuristic,(newNode2))
+        if down:
+            newNode3 = Node((x+1,y),root)
+            heuristic = calcManDistance(x+1,y,goalx,goaly)
+            pq.put(heuristic,(newNode3))
+        if right:
+            newNode4 = Node((x,y+1),root)
+            heuristic = calcManDistance(x,y+1,goalx,goaly)
+            pq.put(heuristic,(newNode4))
+
+    printMazePathCost(maze,root,visited)
+
+    return 0
+
+def betteraStarSearch(maze):
+
+    start = getStartPos(maze)
+    goal = getGoalPos(maze)
+    goalx, goaly = goal
+    x,y = start
+    pq = PriorityQueue()
+    root = Node((0,x,y))
+
+    pq.put((1,0,(x,y)))
+
+    visited = []
+
+    while pq:
+        #yah = input("continue?")
+        h,sp, cords = pq.get()
+        x, y = cords
+        visited.append((x,y))
+
+        if (x,y) == (goalx,goaly):
+            break
+        if h == 0:
+            success = True
+            break
+        else:
+            if maze[x-1][y] == " " or maze[x-1][y] == ".":
+                manD = calcManDistance(x-1,y,goalx,goaly)
+                stepCost = (sp+1)
+                maze[x-1][y] = "v"
+                h = manD + stepCost
+                pq.put((h,stepCost,(x-1,y)))
+                printMaze(maze)
+
+            if maze[x][y-1] == " " or maze[x][y-1] == ".":
+                manD = calcManDistance(x,y-1,goalx,goaly)
+                stepCost = (sp+1)
+                maze[x][y-1] = ">"
+                h = manD + stepCost
+                pq.put((h,stepCost,(x,y-1)))
+                printMaze(maze)
+                
+            if maze[x+1][y] == " " or maze[x+1][y] == ".":
+                manD = calcManDistance(x+1,y,goalx,goaly)
+                stepCost = (sp+1)
+                maze[x+1][y] = "^"
+                h = manD + stepCost
+                pq.put((h,stepCost,(x+1,y)))
+                printMaze(maze)
+                
+            if maze[x][y+1] == " " or maze[x][y+1] == ".":
+                manD = calcManDistance(x,y+1,goalx,goaly)
+                stepCost = (sp+1)
+                maze[x][y+1] = "<"
+                h = manD + stepCost
+                pq.put((h,stepCost,(x,y+1)))
+                printMaze(maze)
+
+    print(returnPath(maze,start,goal))    
+            
+    return 0
+
+def printMazePathCost(maze,node,visited):
+    path = []
+    while node.getParent() != None:
+        x,y = node.getCargo()
+        path.insert(0,(x,y))
+        maze[x][y] = "0"
+        node = node.parent
     printMaze(maze)
+    print("\nSOLUTION: ",path) 
+    print("\nSOLUTION COST: ",len(path))
+    print("\n# OF EXPANDED NODES:{} \n".format(len(visited)))
+
 
 def main():
+    """
+    REMEMBER TO GET RID OF PRINTMAZE WHEN DONE DEBUGGING!!!!
+    """
     parser = argparse.ArgumentParser()
     parser.add_argument("--method", help="method")
     parser.add_argument("maze", help="maze.txt")
@@ -365,7 +479,8 @@ def main():
             betterbreadth(theMaze)
 
         elif args.method == "greedy":
-            greedSearch(theMaze)
+            #greedSearch(theMaze)
+            bettergreedSearch(theMaze)
             
         elif args.method == "astar":
             aStarSearch(theMaze)
