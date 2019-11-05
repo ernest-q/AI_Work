@@ -5,6 +5,7 @@ from queue import PriorityQueue
 from queue import Queue
 
 class Node:
+    
     def __init__(self, cargo=None, parent=None, child=None):
         self.cargo = cargo
         self.parent = parent
@@ -18,6 +19,7 @@ class Node:
 
     def getParent(self):
         return self.parent
+
 
 def mazeToArray(fileSelect):
 
@@ -35,7 +37,9 @@ def mazeToArray(fileSelect):
     
     return mazeArray
 
+
 def getStartPos(maze):
+
     for i in range(len(maze)):
             for x in range(len(maze[i])):
                 if maze[i][x] == "P":
@@ -43,7 +47,9 @@ def getStartPos(maze):
     
     return start
 
+
 def getGoalPos(maze):
+
     for i in range(len(maze)):
             for x in range(len(maze[i])):
                 if maze[i][x] == ".":
@@ -51,11 +57,15 @@ def getGoalPos(maze):
                 
     return goal
 
+
 def calcManDistance(startX,startY,goalX,goalY):
+
     manhatDist = abs(startX - goalX) + abs(startY - goalY)
     return manhatDist
 
+
 def checkAdj(maze,x,y,visited):
+
     up = False
     left = False
     down = False
@@ -111,6 +121,7 @@ def betterbreadth(maze):
         
     printMazePathCost(maze,root,visited)
 
+
 def betterDepthNode(maze):
 
     start = getStartPos(maze)
@@ -147,6 +158,7 @@ def betterDepthNode(maze):
             stack.append(newNode1)
     
     printMazePathCost(maze,root,visited)
+
 
 def bettergreedSearch(maze):
 
@@ -241,10 +253,10 @@ def betteraStarSearch(maze):
             pq.put((heuristic,stepCost,id(newNode4),(newNode4)))
 
     printMazePathCost(maze,root,visited)    
-            
-    return 0
+
 
 def printMazePathCost(maze,node,visited):
+
     path = []
     while node.getParent() != None:
         x,y = node.getCargo()
@@ -258,9 +270,7 @@ def printMazePathCost(maze,node,visited):
 
 
 def main():
-    """
-    REMEMBER TO GET RID OF PRINTMAZE WHEN DONE DEBUGGING!!!!
-    """
+
     parser = argparse.ArgumentParser()
     parser.add_argument("--method", help="method")
     parser.add_argument("maze", help="maze.txt")
@@ -289,6 +299,7 @@ def main():
             exit()
     else:
         print("Invalid file name")
+
 
 if __name__ == "__main__":
     main()
