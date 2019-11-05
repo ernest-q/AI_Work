@@ -99,57 +99,6 @@ def calcManDistance(startX,startY,goalX,goalY):
     manhatDist = abs(startX - goalX) + abs(startY - goalY)
     return manhatDist
 
-def greedSearch(maze):
-
-    success = False
-    start = getStartPos(maze)
-    goal = getGoalPos(maze)
-    goalx, goaly = goal
-    x,y = start
-    pq = PriorityQueue()
-    pq.put((1,(x,y)))
-
-    """ SO IT DOESN'T GO INTO INFINITE LOOP LIKE IT SHOULD"""
-    visited = []
-
-    """UP,LEFT,DOWN,RIGHT"""
-    printMaze(maze)
-    print(pq.empty())
-    while(not success):
-
-        yah = input("continue?")
-        h, cords = pq.get()
-        print(pq.empty())
-        while(not pq.empty()):
-            pq.get()
-        x, y = cords
-        visited.append((x,y))
-        print(x,y)
-
-        maze[x][y] = "+"
-        if h == 0:
-            success = True
-        else:
-            if maze[x-1][y] == " " or maze[x-1][y] == "+":
-                heuristic = calcManDistance(x-1,y,goalx,goaly)
-                pq.put((heuristic,(x-1,y)))
-
-            if maze[x][y-1] == " " or maze[x][y-1] == "+":
-                heuristic = calcManDistance(x,y-1,goalx,goaly)
-                pq.put((heuristic,(x,y-1)))
-                
-            if maze[x+1][y] == " " or maze[x+1][y] == "+":
-                heuristic = calcManDistance(x+1,y,goalx,goaly)
-                pq.put((heuristic,(x+1,y)))
-                
-            if maze[x][y+1] == " " or maze[x][y+1] == " " "+":
-                heuristic = calcManDistance(x,y+1,goalx,goaly)
-                pq.put((heuristic,(x,y+1)))
-                
-        printMaze(maze)
-
-    return 0
-
 def aStarSearch(maze):
 
     success = False
@@ -336,27 +285,19 @@ def bettergreedSearch(maze):
     x,y = start
     root = Node((x,y))
     pq = PriorityQueue()
-    pq.put((1,root))
+    pq.put((1,1,id(root),(root)))
 
     visited = []
 
-    while pq:
-        #yah = input("continue?")
-
-        """
-        FIX THIS HERE!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        """
+    success = False
+    while not success:
 
         z = pq.get()
-        #h = z[0]
-        #x,y = z[1].getCargo()
-        #root = z[1]
-        print(z[1].getCargo())
-        
-        
-        #x,y = root.getCargo()
+        h = z[0]
+        x,y = z[3].getCargo()
+        root = z[3]
 
-        if (x,y) == (goalx,goaly):
+        if h == 0:
             break
         up,left,down,right = checkAdj(maze,x,y,visited)
 
@@ -366,19 +307,19 @@ def bettergreedSearch(maze):
         if up:
             newNode1 = Node((x-1,y),root)
             heuristic = calcManDistance(x-1,y,goalx,goaly)
-            pq.put(heuristic,(newNode1))
+            pq.put((heuristic,1,id(newNode1),(newNode1)))
         if left:
             newNode2 = Node((x,y-1),root)
             heuristic = calcManDistance(x,y-1,goalx,goaly)
-            pq.put(heuristic,(newNode2))
+            pq.put((heuristic,2,id(newNode2),(newNode2)))
         if down:
             newNode3 = Node((x+1,y),root)
             heuristic = calcManDistance(x+1,y,goalx,goaly)
-            pq.put(heuristic,(newNode3))
+            pq.put((heuristic,3,id(newNode3),(newNode3)))
         if right:
             newNode4 = Node((x,y+1),root)
             heuristic = calcManDistance(x,y+1,goalx,goaly)
-            pq.put(heuristic,(newNode4))
+            pq.put((heuristic,4,id(newNode4),(newNode4)))
 
     printMazePathCost(maze,root,visited)
 
