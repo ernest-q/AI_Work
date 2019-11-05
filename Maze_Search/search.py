@@ -20,6 +20,11 @@ class Node:
     def getParent(self):
         return self.parent
 
+def printMaze(maze):
+    for i in range(len(maze)):
+            print()
+            for x in range(len(maze[i])):
+                print(maze[i][x],end="")
 
 def mazeToArray(fileSelect):
 
