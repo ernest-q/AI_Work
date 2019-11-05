@@ -35,13 +35,6 @@ def mazeToArray(fileSelect):
     
     return mazeArray
 
-def printMaze(maze):
-    for i in range(len(maze)):
-            print()
-            for x in range(len(maze[i])):
-                print(maze[i][x],end="")
-                
-
 def getStartPos(maze):
     for i in range(len(maze)):
             for x in range(len(maze[i])):
@@ -58,131 +51,9 @@ def getGoalPos(maze):
                 
     return goal
 
-def returnPath(maze,start,goal):
-    print("here")
-    path = []
-    finished = False
-    goalX, goalY = start
-    x,y = goal
-    path.insert(0,(x,y))
-    while(not finished):
-        #yah = input("continue?")
-        if (x,y) == (goalX,goalY):
-            maze[goalX][goalY] = "."
-            printMaze(maze)
-            return path
-        else:
-            if maze[x][y] == "^":
-                maze[x][y] = " "
-                x,y = (x-1,y)
-                path.insert(0,(x-1,y))
-                printMaze(maze)
-            if maze[x][y] == "<":
-                maze[x][y] = " "
-                x,y = (x,y-1)
-                path.insert(0,(x-1,y))
-                printMaze(maze)
-            if maze[x][y] == "v":
-                maze[x][y] = " "
-                x,y = (x+1,y)
-                path.insert(0,(x-1,y))
-                printMaze(maze)
-            if maze[x][y] == ">":
-                maze[x][y] = " "
-                x,y = (x,y+1)
-                path.insert(0,(x-1,y))
-                printMaze(maze)
-    
-    print("Path Cost: {}".format(len(path)))
-
 def calcManDistance(startX,startY,goalX,goalY):
     manhatDist = abs(startX - goalX) + abs(startY - goalY)
     return manhatDist
-
-def aStarSearch(maze):
-
-    success = False
-    start = getStartPos(maze)
-    goal = getGoalPos(maze)
-    goalx, goaly = goal
-    x,y = start
-    pq = PriorityQueue()
-    """Added, the 0 at the end """
-    pq.put((1,0,(x,y)))
-
-    visited = []
-
-    while not success:
-        #yah = input("continue?")
-        h,sp, cords = pq.get()
-        x, y = cords
-        visited.append((x,y))
-
-        if (x,y) == (goalx,goaly):
-            break
-        if h == 0:
-            success = True
-            break
-        else:
-            if maze[x-1][y] == " " or maze[x-1][y] == ".":
-                """manD = calcManDistance(x-1,y,goalx,goaly)
-                stepCost = (int(maze[x][y])+1)
-                maze[x-1][y] = "{}".format(stepCost)
-                h = manD + stepCost
-                pq.put((h,(x-1,y)))
-                printMaze(maze)"""
-                manD = calcManDistance(x-1,y,goalx,goaly)
-                stepCost = (sp+1)
-                maze[x-1][y] = "v"
-                h = manD + stepCost
-                pq.put((h,stepCost,(x-1,y)))
-                printMaze(maze)
-
-            if maze[x][y-1] == " " or maze[x][y-1] == ".":
-                """manD = calcManDistance(x,y-1,goalx,goaly)
-                stepCost = (int(maze[x][y])+1)
-                maze[x][y-1] = "{}".format(stepCost)
-                h = manD + stepCost
-                pq.put((h,(x,y-1)))
-                printMaze(maze)"""
-                manD = calcManDistance(x,y-1,goalx,goaly)
-                stepCost = (sp+1)
-                maze[x][y-1] = ">"
-                h = manD + stepCost
-                pq.put((h,stepCost,(x,y-1)))
-                printMaze(maze)
-                
-            if maze[x+1][y] == " " or maze[x+1][y] == ".":
-                """manD = calcManDistance(x+1,y,goalx,goaly)
-                stepCost = (int(maze[x][y])+1)
-                maze[x+1][y] = "{}".format(stepCost)
-                h = manD + stepCost
-                pq.put((h,(x+1,y)))
-                printMaze(maze)"""
-                manD = calcManDistance(x+1,y,goalx,goaly)
-                stepCost = (sp+1)
-                maze[x+1][y] = "^"
-                h = manD + stepCost
-                pq.put((h,stepCost,(x+1,y)))
-                printMaze(maze)
-                
-            if maze[x][y+1] == " " or maze[x][y+1] == ".":
-                """manD = calcManDistance(x,y+1,goalx,goaly)
-                stepCost = (int(maze[x][y])+1)
-                maze[x][y+1] = "{}".format(stepCost)
-                h = manD + stepCost
-                pq.put((h,(x,y+1)))
-                printMaze(maze)"""
-                manD = calcManDistance(x,y+1,goalx,goaly)
-                stepCost = (sp+1)
-                maze[x][y+1] = "<"
-                h = manD + stepCost
-                pq.put((h,stepCost,(x,y+1)))
-                printMaze(maze)
-
-    print(returnPath(maze,start,goal))    
-            
-    return 0
 
 def checkAdj(maze,x,y,visited):
     up = False
@@ -323,7 +194,6 @@ def bettergreedSearch(maze):
 
     printMazePathCost(maze,root,visited)
 
-    return 0
 
 def betteraStarSearch(maze):
 
@@ -331,58 +201,46 @@ def betteraStarSearch(maze):
     goal = getGoalPos(maze)
     goalx, goaly = goal
     x,y = start
+    root = Node((x,y))
     pq = PriorityQueue()
-    root = Node((0,x,y))
-
-    pq.put((1,0,(x,y)))
+    pq.put((1,0,id(root),(root)))
 
     visited = []
 
-    while pq:
-        #yah = input("continue?")
-        h,sp, cords = pq.get()
-        x, y = cords
-        visited.append((x,y))
+    success = False
+    while not success:
+        z = pq.get()
+        h = z[0]
+        sp = z[1]
+        x,y = z[3].getCargo()
+        root = z[3]
 
         if (x,y) == (goalx,goaly):
             break
-        if h == 0:
-            success = True
-            break
-        else:
-            if maze[x-1][y] == " " or maze[x-1][y] == ".":
-                manD = calcManDistance(x-1,y,goalx,goaly)
-                stepCost = (sp+1)
-                maze[x-1][y] = "v"
-                h = manD + stepCost
-                pq.put((h,stepCost,(x-1,y)))
-                printMaze(maze)
+        up,left,down,right = checkAdj(maze,x,y,visited)
 
-            if maze[x][y-1] == " " or maze[x][y-1] == ".":
-                manD = calcManDistance(x,y-1,goalx,goaly)
-                stepCost = (sp+1)
-                maze[x][y-1] = ">"
-                h = manD + stepCost
-                pq.put((h,stepCost,(x,y-1)))
-                printMaze(maze)
-                
-            if maze[x+1][y] == " " or maze[x+1][y] == ".":
-                manD = calcManDistance(x+1,y,goalx,goaly)
-                stepCost = (sp+1)
-                maze[x+1][y] = "^"
-                h = manD + stepCost
-                pq.put((h,stepCost,(x+1,y)))
-                printMaze(maze)
-                
-            if maze[x][y+1] == " " or maze[x][y+1] == ".":
-                manD = calcManDistance(x,y+1,goalx,goaly)
-                stepCost = (sp+1)
-                maze[x][y+1] = "<"
-                h = manD + stepCost
-                pq.put((h,stepCost,(x,y+1)))
-                printMaze(maze)
+        if (x,y) not in visited:
+            visited.append((x,y))
 
-    print(returnPath(maze,start,goal))    
+        stepCost = (sp+1)
+        if up:
+            newNode1 = Node((x-1,y),root)
+            heuristic = calcManDistance(x-1,y,goalx,goaly) + stepCost
+            pq.put((heuristic,stepCost,id(newNode1),(newNode1)))
+        if left:
+            newNode2 = Node((x,y-1),root)
+            heuristic = calcManDistance(x,y-1,goalx,goaly) + stepCost
+            pq.put((heuristic,stepCost,id(newNode2),(newNode2)))
+        if down:
+            newNode3 = Node((x+1,y),root)
+            heuristic = calcManDistance(x+1,y,goalx,goaly) + stepCost
+            pq.put((heuristic,stepCost,id(newNode3),(newNode3)))
+        if right:
+            newNode4 = Node((x,y+1),root)
+            heuristic = calcManDistance(x,y+1,goalx,goaly) + stepCost
+            pq.put((heuristic,stepCost,id(newNode4),(newNode4)))
+
+    printMazePathCost(maze,root,visited)    
             
     return 0
 
@@ -424,7 +282,8 @@ def main():
             bettergreedSearch(theMaze)
             
         elif args.method == "astar":
-            aStarSearch(theMaze)
+            #aStarSearch(theMaze)
+            betteraStarSearch(theMaze)
         else:
             print("Invalid operation")
             exit()
