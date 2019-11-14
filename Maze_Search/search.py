@@ -179,7 +179,6 @@ def bettergreedSearch(maze):
 
     success = False
     while not success:
-
         z = pq.get()
         h = z[0]
         x,y = z[3].getCargo()

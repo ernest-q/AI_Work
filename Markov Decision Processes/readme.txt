@@ -1,0 +1,1 @@
+Utilizing code found in http://aima.cs.berkeley.edu/python/ and extending it to accept mazes of up to 15x15 squares among other extra functionality.
