@@ -13,6 +13,9 @@ and policy_iteration algorithms."""
 
 from utils2 import *
 
+import argparse
+from os import path
+
 class MDP:
     """A Markov Decision Process, defined by an initial state, transition model,
     and reward function. We also keep track of a gamma value, for use by
@@ -89,6 +92,51 @@ Fig= GridMDP([[-0.04, -0.04, -0.04, +1],
                      [-0.04, -0.04, -0.04, -0.04]],
                     terminals=[(3, 2), (3, 1)])
 
+"""
+Converts the maze file to the a format that is usable by 
+the GridMDP class.
+"""
+def mazeToArray(mazeFile):
+
+    file = open("{}".format(mazeFile),"r")
+    contents = file.read()
+
+    splitMaze = contents.split("\n")
+    mazeArray = []
+
+    for i in range(len(splitMaze)):
+        innerMaze = []
+        for x in range(len(splitMaze[i])):
+            innerMaze.append(splitMaze[i][x])
+        mazeArray.append(innerMaze)
+    
+    return mazeArray
+
+def arrayToGrid(arrayMaze):
+    valueGrid = []
+    for z in range(len(arrayMaze)-1):
+        valueGrid.append([])
+    for y in range(1,len(valueGrid)):
+        for x in range(1,len(arrayMaze[y])-1):
+            if arrayMaze[y][x] == " ":
+                valueGrid[y].append(-.04)
+            elif arrayMaze[y][x] == "P":
+                valueGrid[y].append(1)
+            elif arrayMaze[y][x] == "N":
+                valueGrid[y].append(-1)
+            elif arrayMaze[y][x] == "%":
+                valueGrid[y].append(None)
+
+    return valueGrid
+
+def findTerminal(mazeArray):
+    terminals = []
+    for y in range(len(mazeArray)):
+        for x in range(len(mazeArray[y])):
+            if mazeArray[y][x] == "P" or mazeArray[y][x] == "N":
+                terminals.append((y+1,x))
+    return terminals
+
 
 def value_iteration(mdp, epsilon=0.001):
     "Solving an MDP by value iteration. [Fig. 17.4]"
@@ -117,12 +165,49 @@ def expected_utility(a, s, U, mdp):
     return sum([p * U[s1] for (p, s1) in mdp.T(s, a)])
 
 
+def main():
+    """#demo
+    m = Fig
+    print(m)
+    pi = best_policy(m, value_iteration(m, .01))
+    print(pi)
+    print(m.to_arrows(pi))
+    print(value_iteration(m, .01))"""
 
-#demo
-m = Fig
-print(m)
-pi = best_policy(m, value_iteration(m, .01))
-print(pi)
-print(m.to_arrows(pi))
-print(value_iteration(m, .01))
+    parser = argparse.ArgumentParser()
+    parser.add_argument("maze",help="maze.txt")
+    args = parser.parse_args()
+    mazeFile = args.maze
+    if path.exists(mazeFile):
 
+        convertedMaze = mazeToArray(mazeFile)
+        for x in range(len(convertedMaze)):
+            print()
+            for y in range(len(convertedMaze[x])):
+                print(convertedMaze[x][y],end="")
+
+        terms = findTerminal(convertedMaze)
+
+        grid = arrayToGrid(convertedMaze)
+        for x in range(len(grid)):
+            print()
+            for y in range(len(grid[x])):
+                print(grid[x][y],end="")
+        
+        newMDPGrid = []
+        newMDPGrid.append(grid)
+        newMDPGrid.append(terms)
+
+    """grid = grid[::-1]
+    for x in range(len(grid)):
+            print()
+            for y in range(len(grid[x])):
+                print(grid[x][y],end="")"""
+
+    GridMDP(newMDPGrid)
+
+
+    print(findTerminal(convertedMaze))
+
+if __name__ == "__main__":
+    main()
