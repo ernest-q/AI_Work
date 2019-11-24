@@ -204,10 +204,14 @@ def main():
             for y in range(len(grid[x])):
                 print(grid[x][y],end="")"""
 
-    GridMDP(newMDPGrid)
-
-
+    
     print(findTerminal(convertedMaze))
+    m = GridMDP(newMDPGrid,findTerminal(convertedMaze))
+    print(m)
+    pi = best_policy(m, value_iteration(m, .01))
+    print(pi)
+    print(m.to_arrows(pi))
+    print(value_iteration(m, .01))
 
 if __name__ == "__main__":
     main()
