@@ -67,9 +67,9 @@ class GridMDP(MDP):
         if action == None:
             return [(0.0, state)]
         else:
-            return [(0.8, self.go(state, action)),
-                    (0.1, self.go(state, turn_right(action))),
-                    (0.1, self.go(state, turn_left(action)))]
+            return [(0.75, self.go(state, action)),
+                    (0.125, self.go(state, turn_right(action))),
+                    (0.125, self.go(state, turn_left(action)))]
 
     def go(self, state, direction):
         "Return the state that results from going in this direction."
@@ -86,11 +86,6 @@ class GridMDP(MDP):
         chars = {(1, 0):'>', (0, 1):'^', (-1, 0):'<', (0, -1):'v', None: '.'}
         return self.to_grid(dict([(s, chars[a]) for (s, a) in policy.items()]))
 
-
-Fig= GridMDP([[-0.04, -0.04, -0.04, +1],
-                     [-0.04, None,  -0.04, -1],
-                     [-0.04, -0.04, -0.04, -0.04]],
-                    terminals=[(3, 2), (3, 1)])
 
 """
 Converts the maze file to the a format that is usable by 
@@ -112,29 +107,38 @@ def mazeToArray(mazeFile):
     
     return mazeArray
 
+Fig= GridMDP([[-0.04, -0.04, -0.04, +1],
+                     [-0.04, None,  -0.04, -1],
+                     [-0.04, -0.04, -0.04, -0.04]],
+                    terminals=[(3, 2), (3, 1)])
+
 def arrayToGrid(arrayMaze):
     valueGrid = []
-    for z in range(len(arrayMaze)-1):
+    for z in range(len(arrayMaze)-2):
         valueGrid.append([])
-    for y in range(1,len(valueGrid)):
+
+    
+    for y in range(1,len(arrayMaze)-1):
         for x in range(1,len(arrayMaze[y])-1):
             if arrayMaze[y][x] == " ":
-                valueGrid[y].append(-.04)
+                valueGrid[y-1].append(-.04)
             elif arrayMaze[y][x] == "P":
-                valueGrid[y].append(1)
+                valueGrid[y-1].append(1)
             elif arrayMaze[y][x] == "N":
-                valueGrid[y].append(-1)
+                valueGrid[y-1].append(-1)
             elif arrayMaze[y][x] == "%":
-                valueGrid[y].append(None)
+                valueGrid[y-1].append(None)
 
     return valueGrid
 
 def findTerminal(mazeArray):
     terminals = []
-    for y in range(len(mazeArray)):
-        for x in range(len(mazeArray[y])):
-            if mazeArray[y][x] == "P" or mazeArray[y][x] == "N":
-                terminals.append((y+1,x))
+    mazeArray2 = mazeArray[::-1]
+    printMazeOrGrid(mazeArray2)
+    for y in range(len(mazeArray2)):
+        for x in range(len(mazeArray2[y])):
+            if mazeArray2[y][x] == "P" or mazeArray2[y][x] == "N":
+                terminals.append((x,y-1))
     return terminals
 
 
@@ -164,15 +168,33 @@ def expected_utility(a, s, U, mdp):
     "The expected utility of doing a in state s, according to the MDP and U."
     return sum([p * U[s1] for (p, s1) in mdp.T(s, a)])
 
+def printMazeOrGrid(mazeOrGrid):
+    for y in range(len(mazeOrGrid)):
+        print()
+        for x in range(len(mazeOrGrid[y])):
+            print(mazeOrGrid[y][x],end="")
 
 def main():
-    """#demo
-    m = Fig
-    print(m)
-    pi = best_policy(m, value_iteration(m, .01))
+    #demo
+    a = Fig
+    print(type(a))
+    print(a)
+    pi = best_policy(a, value_iteration(a, .01))
     print(pi)
-    print(m.to_arrows(pi))
-    print(value_iteration(m, .01))"""
+    print(a.to_arrows(pi))
+    print()
+    for y in range(len(a.to_arrows(pi))):
+        print(a.to_arrows(pi)[y])
+    print()
+    print(value_iteration(a, .01))
+
+    print("\n\n\n~~~~~~~~~~~~~~~~~~~~~~~~~~~\n\n\n")
+
+
+    """Fig= GridMDP([[-0.04, -0.04, -0.04, +1],
+                     [-0.04, None,  -0.04, -1],
+                     [-0.04, -0.04, -0.04, -0.04]],
+                    terminals=[(3, 2), (3, 1)])"""
 
     parser = argparse.ArgumentParser()
     parser.add_argument("maze",help="maze.txt")
@@ -198,20 +220,24 @@ def main():
         newMDPGrid.append(grid)
         newMDPGrid.append(terms)
 
+    print("\n\n")
+    print(grid)
+    print()
+    print(terms)
+
     """grid = grid[::-1]
     for x in range(len(grid)):
             print()
             for y in range(len(grid[x])):
                 print(grid[x][y],end="")"""
-
     
-    print(findTerminal(convertedMaze))
-    m = GridMDP(newMDPGrid,findTerminal(convertedMaze))
+    m = GridMDP(grid,terms)
     print(m)
-    pi = best_policy(m, value_iteration(m, .01))
-    print(pi)
-    print(m.to_arrows(pi))
-    print(value_iteration(m, .01))
+    pi = best_policy(m, value_iteration(m, .01)) 
+    print("\n\nPI:\n{}\n".format(pi))
+    for y in range(len(m.to_arrows(pi))):
+        print(m.to_arrows(pi)[y])
+    print("\n\nValue Iteration:\n{}\n".format(value_iteration(m, .01)))
 
 if __name__ == "__main__":
     main()
